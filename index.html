@@ -2151,7 +2151,7 @@ function drawParticles(t) {
     ctx.globalAlpha = clamp(p.life / p.maxLife, 0, 1);
     ctx.fillStyle = p.color;
     ctx.beginPath();
-    ctx.arc(p.x, p.y, p.size * (p.life / p.maxLife), 0, PI2);
+    ctx.arc(p.x, p.y, Math.max(0, p.size * (p.life / p.maxLife)), 0, PI2);
     ctx.fill();
   });
   ctx.globalAlpha = 1;
@@ -2584,7 +2584,7 @@ function pointerDown(e) {
   e.preventDefault();
   if (!T) return;
   if (T.phase === "idle") { T.suppressClick = false; pressCast(); return; }
-  if (T.phase === "hooked") { T.reeling = true; return; }
+  if (T.phase === "hooked") { T.reeling = true; T.suppressClick = true; return; }
   if (T.biteFish || T.strikeTimer > 0) {
     if (tryHook()) { T.reeling = true; T.suppressClick = true; }
     return;
