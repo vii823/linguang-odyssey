@@ -836,6 +836,7 @@ function initFishingSession() {
     biteFish: null,
     biteTimer: 0,
     biteDips: 0,
+    suppressClick: false,
     shakeX: 0,
     shakeY: 0,
     fish: [],
@@ -2582,8 +2583,12 @@ castBtn.addEventListener("click", () => {
 function pointerDown(e) {
   e.preventDefault();
   if (!T) return;
+  if (T.phase === "idle") { T.suppressClick = false; pressCast(); return; }
   if (T.phase === "hooked") { T.reeling = true; return; }
-  if (T.biteFish || T.strikeTimer > 0) { tryHook(); return; }
+  if (T.biteFish || T.strikeTimer > 0) {
+    if (tryHook()) { T.reeling = true; T.suppressClick = true; }
+    return;
+  }
   if (T.phase === "retrieve") {
     T.reeling = true;
     T.lureTwitch = 8;
@@ -2604,7 +2609,10 @@ canvas.addEventListener("touchend", pointerUp, { passive: false });
 canvas.addEventListener("touchcancel", pointerUp, { passive: false });
 canvas.addEventListener("contextmenu", e => e.preventDefault());
 canvas.addEventListener("click", () => {
-  if (T && T.phase === "idle") pressCast();
+  if (T && T.phase === "idle") {
+    if (T.suppressClick) { T.suppressClick = false; return; }
+    pressCast();
+  }
 });
 
 document.addEventListener("keydown", e => {
